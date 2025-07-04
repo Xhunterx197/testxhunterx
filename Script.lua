@@ -1,6 +1,7 @@
--- Fly Script with Draggable UI for Roblox by Hunter
+-- Fly Script with Joystick UI for Roblox by Hunter
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- Create UI
 local ScreenGui = Instance.new("ScreenGui")
@@ -8,13 +9,12 @@ ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 150, 0, 100)
-Frame.Position = UDim2.new(0.5, -75, 0.8, -50) -- Lower on screen for mobile
+Frame.Position = UDim2.new(0.5, -75, 0.8, -50) -- Lower for mobile
 Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Frame.BorderSizePixel = 0
 Frame.BackgroundTransparency = 0.2
+Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 
--- Add corner radius for better look
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 10)
 UICorner.Parent = Frame
@@ -78,6 +78,7 @@ end)
 local flying = false
 local speed = 50
 local bodyVelocity = nil
+local joystickInput = Vector3.new(0, 0, 0)
 
 local function toggleFly()
     if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then return end
@@ -100,28 +101,59 @@ end
 
 FlyButton.MouseButton1Click:Connect(toggleFly)
 
--- Fly controls (PC and Mobile)
+-- Joystick-like control for mobile
+local touchStartPos = nil
+local touchId = nil
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and flying and input.UserInputType == Enum.UserInputType.Touch and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        touchStartPos = input.Position
+        touchId = input.UserInputId
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input, gameProcessed)
+    if not gameProcessed and flying and input.UserInputType == Enum.UserInputType.Touch and input.UserInputId == touchId and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        local touchPos = input.Position
+        local delta = touchPos - touchStartPos
+        local direction = Vector3.new(delta.X, -delta.Y, 0).Unit * speed -- Follow finger direction
+        joystickInput = direction
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.UserInputType == Enum.UserInputType.Touch and input.UserInputId == touchId then
+        joystickInput = Vector3.new(0, 0, 0)
+        touchId = nil
+    end
+end)
+
+-- PC controls (W, S, Space, LeftControl)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and flying and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-        if input.KeyCode == Enum.KeyCode.W or input.UserInputType == Enum.UserInputType.Touch then
-            bodyVelocity.Velocity = Player.Character.HumanoidRootPart.CFrame.LookVector * speed
+        if input.KeyCode == Enum.KeyCode.W then
+            joystickInput = Player.Character.HumanoidRootPart.CFrame.LookVector * speed
         elseif input.KeyCode == Enum.KeyCode.S then
-            bodyVelocity.Velocity = Player.Character.HumanoidRootPart.CFrame.LookVector * -speed
+            joystickInput = Player.Character.HumanoidRootPart.CFrame.LookVector * -speed
         elseif input.KeyCode == Enum.KeyCode.Space then
-            bodyVelocity.Velocity = Vector3.new(0, speed, 0)
+            joystickInput = Vector3.new(0, speed, 0)
         elseif input.KeyCode == Enum.KeyCode.LeftControl then
-            bodyVelocity.Velocity = Vector3.new(0, -speed, 0)
+            joystickInput = Vector3.new(0, -speed, 0)
         end
     end
 end)
 
 UserInputService.InputEnded:Connect(function(input, gameProcessed)
-    if not gameProcessed and flying and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-        if input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.S or
-           input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.LeftControl or
-           input.UserInputType == Enum.UserInputType.Touch then
-            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        end
+    if not gameProcessed and flying and (input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.S or
+       input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.LeftControl) then
+        joystickInput = Vector3.new(0, 0, 0)
+    end
+end)
+
+-- Update velocity
+RunService.RenderStepped:Connect(function()
+    if flying and bodyVelocity and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        bodyVelocity.Velocity = joystickInput
     end
 end)
 
@@ -133,4 +165,5 @@ Player.CharacterAdded:Connect(function(character)
         bodyVelocity:Destroy()
         bodyVelocity = nil
     end
+    joystickInput = Vector3.new(0, 0, 0)
 end)
