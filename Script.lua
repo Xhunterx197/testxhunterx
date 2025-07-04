@@ -1,26 +1,32 @@
--- Fly Script with UI for Roblox by Hunter
+-- Fly Script with Draggable UI for Roblox by Hunter
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
-local StarterGui = game:GetService("StarterGui")
 
 -- Create UI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 200, 0, 100)
-Frame.Position = UDim2.new(0.5, -100, 0.5, -50)
-Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Frame.BorderSizePixel = 2
+Frame.Size = UDim2.new(0, 150, 0, 100)
+Frame.Position = UDim2.new(0.5, -75, 0.8, -50) -- Lower on screen for mobile
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.BorderSizePixel = 0
+Frame.BackgroundTransparency = 0.2
 Frame.Parent = ScreenGui
+
+-- Add corner radius for better look
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Frame
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Position = UDim2.new(0, 0, 0, 5)
 Title.Text = "Fly Owned by Hunter"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Title.BackgroundTransparency = 1
 Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
 Title.Parent = Frame
 
 local FlyButton = Instance.new("TextButton")
@@ -30,7 +36,43 @@ FlyButton.Text = "Toggle Fly"
 FlyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 FlyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 FlyButton.TextScaled = true
+FlyButton.Font = Enum.Font.Gotham
 FlyButton.Parent = Frame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 8)
+ButtonCorner.Parent = FlyButton
+
+-- Draggable UI
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
 
 -- Fly functionality
 local flying = false
@@ -38,6 +80,7 @@ local speed = 50
 local bodyVelocity = nil
 
 local function toggleFly()
+    if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then return end
     if flying then
         flying = false
         FlyButton.Text = "Enable Fly"
@@ -57,10 +100,10 @@ end
 
 FlyButton.MouseButton1Click:Connect(toggleFly)
 
--- Fly controls
+-- Fly controls (PC and Mobile)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and flying then
-        if input.KeyCode == Enum.KeyCode.W then
+    if not gameProcessed and flying and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        if input.KeyCode == Enum.KeyCode.W or input.UserInputType == Enum.UserInputType.Touch then
             bodyVelocity.Velocity = Player.Character.HumanoidRootPart.CFrame.LookVector * speed
         elseif input.KeyCode == Enum.KeyCode.S then
             bodyVelocity.Velocity = Player.Character.HumanoidRootPart.CFrame.LookVector * -speed
@@ -73,10 +116,21 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 UserInputService.InputEnded:Connect(function(input, gameProcessed)
-    if not gameProcessed and flying then
+    if not gameProcessed and flying and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
         if input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.S or
-           input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.LeftControl then
+           input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.LeftControl or
+           input.UserInputType == Enum.UserInputType.Touch then
             bodyVelocity.Velocity = Vector3.new(0, 0, 0)
         end
+    end
+end)
+
+-- Reset on character respawn
+Player.CharacterAdded:Connect(function(character)
+    flying = false
+    FlyButton.Text = "Enable Fly"
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+        bodyVelocity = nil
     end
 end)
